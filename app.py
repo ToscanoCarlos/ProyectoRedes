@@ -5,6 +5,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@localhost/redesdb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Inicializa Flask-SQLAlchemy
+
 
 class ValidaError(ValueError):
     pass
@@ -66,6 +68,28 @@ class Interface(db.Model):
             'router_conectado': self.router_conectado
         }
 
+class Usuario(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100))
+    permisos = db.Column(db.String(100))
+    dispositivos = db.Column(db.String(100))
+
+    def exporta_datos(self):
+        return {
+            'nombre': self.nombre,
+            'permisos': self.permisos,
+            'dispositivos': self.dispositivos
+        }
+
+    def importa_datos(self, datos):
+        try:
+            self.nombre = datos['nombre']
+            self.permisos = datos['permisos']
+            self.dispositivos = datos['dispositivos']
+        except KeyError as e:
+            raise ValidaError('Usuario inválido: falta ' + e.args[0])
+        return self
+
 @app.route('/routers', methods=['GET'])
 def get_all_routers():
     routers = Router.query.all()
@@ -84,21 +108,21 @@ def get_router_interfaces(hostname):
 
 @app.route('/routers/<string:hostname>/usuarios', methods=['GET'])
 def get_router_users(hostname):
-    # Implementa lógica para obtener usuarios en el router específico y devuelve la respuesta en formato JSON.
+    # Implementa la lógica para obtener usuarios en el router específico y devuelve la respuesta en formato JSON.
     return jsonify({})
 
 @app.route('/routers/<string:hostname>/usuarios', methods=['POST'])
 def create_router_user(hostname):
-    # Implementa lógica para crear un nuevo usuario en el router específico y devuelve la respuesta en formato JSON.
+    # Implementa la lógica para crear un nuevo usuario en el router específico y devuelve la respuesta en formato JSON.
     return jsonify({}), 201
 
 @app.route('/routers/<string:hostname>/usuarios/<int:user_id>', methods=['PUT', 'DELETE'])
 def update_or_delete_router_user(hostname, user_id):
     if request.method == 'PUT':
-        # Implementa lógica para actualizar un usuario en el router específico y devuelve la respuesta en formato JSON.
+        # Implementa la lógica para actualizar un usuario en el router específico y devuelve la respuesta en formato JSON.
         return jsonify({})
     elif request.method == 'DELETE':
-        # Implementa lógica para eliminar un usuario en el router específico y devuelve la respuesta en formato JSON.
+        # Implementa la lógica para eliminar un usuario en el router específico y devuelve la respuesta en formato JSON.
         return jsonify({})
 
 if __name__ == '__main__':
