@@ -20,6 +20,7 @@ class Router(db.Model):
     rol = db.Column(db.String(64))
     empresa = db.Column(db.String(64))
     so = db.Column(db.String(64))
+    vecinos = db.Column(db.String(64))
 
     def dame_url(self):
         return url_for('get_router_by_hostname', hostname=self.hostname, _external=True)
@@ -32,7 +33,8 @@ class Router(db.Model):
             'admin_ip': self.admin_ip,
             'rol': self.rol,
             'empresa': self.empresa,
-            'so': self.so
+            'so': self.so,
+            'vecinos': self.vecinos
         }
 
     def importa_datos(self, datos):
@@ -43,6 +45,7 @@ class Router(db.Model):
             self.rol = datos['rol']
             self.empresa = datos['empresa']
             self.so = datos['so']
+            self.vecinos = datos['vecinos']
         except KeyError as e:
             raise ValidaError('Router inválido: falta ' + e.args[0])
         return self
@@ -98,10 +101,6 @@ def index():
 def usuarios():
     return render_template('usuarios.html')
 
-@app.route('/topologia')
-def topologia():
-    return render_template('topologia.html')
-
 @app.route('/routes')
 def routes():
     return render_template('routes.html')
@@ -140,6 +139,15 @@ def update_or_delete_router_user(hostname, user_id):
     elif request.method == 'DELETE':
         # Implementa la lógica para eliminar un usuario en el router específico y devuelve la respuesta en formato JSON.
         return jsonify({})
+    
+@app.route('/topologia')
+def topologia():
+    return render_template('topologia.html')    
+
+@app.route('/topologia', methods=['GET'])
+def get_topologia():
+    # Implementa la lógica para obtener la topología y devuelve la respuesta en formato JSON.
+    return jsonify({}) 
 
 if __name__ == '__main__':
     app.run(debug=True)
