@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Routers y Usuarios</title>
+</head>
+<body>
+    <h1>Gestión de Routers y Usuarios</h1>
+
+    <!-- Botón para obtener la información general de todos los routers -->
+    <button type="button" id="get-all-routers-button">Obtener Información de Routers</button>
+    <!-- Botón para obtener la información de un router especifico -->
+    <button type="button" id="get-router-button">Obtener Información de Router Específico</button>
+    <!-- Botón para obtener la a información general de la interfaz del router definido -->
+    <button type="button" id="get-interface-button">Obtener Información de Interfaz</button>
+    
+
+    <!-- Espacio para mostrar la información de routers -->
+    <div id="router-info">
+        <!-- Aquí se mostrará la información general de los routers en formato JSON -->
+    </div>
+    
+    <h2>Obtener json con los usuarios existentes en el router específico</h2>
+    <button type="button" id="get-users-button">Obtener Usuarios</button>
+
+    <!-- Formulario para agregar un nuevo usuario a un router específico -->
+    <h2>Agregar Usuario a Router Específico</h2>
+    <form id="add-user-form">
+        <label>Nombre del Router:</label>
+        <input type="text" id="router-name" name="router-name">
+        <label>Nombre del Usuario:</label>
+        <input type="text" id="user-name" name="user-name">
+        <label>Permisos del Usuario:</label>
+        <input type="text" id="user-permissions" name="user-permissions">
+        <button type="button" id="add-user-button">Agregar Usuario</button>
+    </form>
+
+    <!-- Espacio para mostrar la información de usuarios en el router seleccionado -->
+    <div id="user-info">
+        <!-- Aquí se mostrará la información de usuarios en formato JSON -->
+    </div>
+
+    <!-- Formulario para actualizar o eliminar un usuario en un router específico -->
+    <h2>Actualizar o Eliminar Usuario en Router Específico</h2>
+    <form id="update-delete-user-form">
+        <label>Nombre del Router:</label>
+        <input type="text" id="update-delete-router-name" name="update-delete-router-name">
+        <label>Nombre del Usuario:</label>
+        <input type="text" id="update-delete-user-name" name="update-delete-user-name">
+        <label>Permisos del Usuario:</label>
+        <input type="text" id="update-delete-user-permissions" name="update-delete-user-permissions">
+        <button type="button" id="update-user-button">Actualizar Usuario</button>
+        <button type="button" id="delete-user-button">Eliminar Usuario</button>
+    </form>
+
+    <!-- Espacio para mostrar la respuesta de la operación de actualizar o eliminar un usuario -->
+    <div id="update-delete-user-info">
+        <!-- Aquí se mostrará la respuesta en formato JSON -->
+    </div>
+
+</body>
+</html>

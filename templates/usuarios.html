@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD de Usuarios</title>
+</head>
+<body>
+    <h1>Usuarios</h1>
+
+    <h2>Obtener Json de Usuarios</h2>
+    <button type="button" id="get-users-button">Obtener Usuarios</button>
+
+    <h2>Crear Usuario</h2>
+    <form id="create-form">
+        <label>Nombre:</label>
+        <input type="text" id="nombre" name="nombre">
+        <label>Permisos:</label>
+        <input type="text" id="permisos" name="permisos">
+        <label>Dispositivos:</label>
+        <input type="text" id="dispositivos" name="dispositivos">
+        <button type="button" id="create-button">Crear Usuario</button>
+    </form>
+
+    <h2>Usuarios Existentes</h2>
+    <div id="user-list">
+        <!-- Aquí se mostrarán los usuarios existentes en formato JSON -->
+    </div>
+
+    <h2>Actualizar o Eliminar Usuario</h2>
+    <form id="update-form">
+        <label>Nombre del Usuario a Actualizar/Eliminar:</label>
+        <input type="text" id="update-nombre" name="update-nombre">
+        <label>Permisos:</label>
+        <input type="text" id="update-permisos" name="update-permisos">
+        <label>Dispositivos:</label>
+        <input type="text" id="update-dispositivos" name="update-dispositivos">
+        <button type="button" id="update-button">Actualizar Usuario</button>
+        <button type="button" id="delete-button">Eliminar Usuario</button>
+    </form>
+
+</body>
+</html>

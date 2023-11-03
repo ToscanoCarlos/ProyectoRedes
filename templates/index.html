@@ -4,8 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Redes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+        a.btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        a.btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <h1>API-REST de Gestión de Redes con SSH y Topología Dinámica</h1>
+
+    <a href="{{ url_for('routes')}}" class="btn">Routes</a>
+    <a href="{{ url_for('usuarios') }}" class="btn">Usuarios</a>
+    <a href="{{ url_for('topologia')}}" class="btn">Topología</a>
 </body>
 </html>

@@ -1,4 +1,4 @@
-from flask import Flask, url_for, jsonify, request
+from flask import Flask, url_for, jsonify, request, render_template
 from utils.db import db
 
 app = Flask(__name__)
@@ -89,6 +89,22 @@ class Usuario(db.Model):
         except KeyError as e:
             raise ValidaError('Usuario inválido: falta ' + e.args[0])
         return self
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/usuarios')
+def usuarios():
+    return render_template('usuarios.html')
+
+@app.route('/topologia')
+def topologia():
+    return render_template('topologia.html')
+
+@app.route('/routes')
+def routes():
+    return render_template('routes.html')
 
 @app.route('/routers', methods=['GET'])
 def get_all_routers():
