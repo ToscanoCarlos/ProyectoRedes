@@ -1,0 +1,41 @@
+{% extends "layout.html" %} {% block body %}
+
+<div class="col-md-4 offset-md-4">
+  <div class="card card-body bg-dark text-white">
+    <h1>Edit Usuario</h1>
+
+    <form action="{{url_for('usuarios.update', id=usuario.id)}}" method="POST">
+      <div class="mb-3">
+        <label for="fullname">Nombre:</label>
+        <input
+          type="text"
+          name="fullname"
+          value="{{usuario.nombre}}"
+          class="form-control bg-dark text-white rounded-0"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="email">Permisos:</label>
+        <input
+          type="email"
+          name="email"
+          value="{{usuario.nombre}}"
+          class="form-control bg-dark text-white rounded-0"
+        />
+      </div>
+      <div class="mb-3">
+        <label for="phone">Dispositivos:</label>
+        <input
+          type="tel"
+          name="phone"
+          value="{{usuario.nombre}}"
+          class="form-control bg-dark text-white rounded-0"
+        />
+      </div>
+
+      <button class="btn btn-primary">Update</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

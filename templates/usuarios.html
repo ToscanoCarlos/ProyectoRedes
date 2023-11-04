@@ -8,24 +8,53 @@
 <body>
     <h1>Usuarios</h1>
 
+    <!-- Bloque para mostrar los mensajes flash -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flash-messages">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
     <h2>Obtener Json de Usuarios</h2>
     <button type="button" id="get-users-button">Obtener Usuarios</button>
 
     <h2>Crear Usuario</h2>
-    <form id="create-form">
+    <form action="/new_usuario" method="POST">
         <label>Nombre:</label>
-        <input type="text" id="nombre" name="nombre">
+        <input type="text" name="nombre" autofocus>
         <label>Permisos:</label>
-        <input type="text" id="permisos" name="permisos">
+        <input type="text" name="permisos" autofocus>
         <label>Dispositivos:</label>
-        <input type="text" id="dispositivos" name="dispositivos">
-        <button type="button" id="create-button">Crear Usuario</button>
+        <input type="text" name="dispositivos" autofocus>
+        <button type="submit">Crear Usuario</button>
     </form>
 
     <h2>Usuarios Existentes</h2>
     <div id="user-list">
         <!-- Aquí se mostrarán los usuarios existentes en formato JSON -->
     </div>
+
+    <div class="col-md-7">
+        {% for usuario in usuarios %}
+          <div class="card mb-1 bg-black text-white">
+            <div class="card-body py-2 px-3">
+              <div class="d-flex justify-content-between">
+                <h5 class="card-title h6">{{ usuario.nombre}}</h5>
+                <div>
+                  <a href="{{ url_for('app.update_usuario', id=usuario.id) }}" class="btn btn-dark btn-sm rounded-0">Edit</a>
+                  <a href="{{ url_for('app.delete_usuario', id=usuario.id) }}" class="btn btn-danger btn-sm rounded-0">Delete</a>
+                </div>
+              </div>
+              <p class="card-text">{{ usuario.nombre }}</p>
+              <p class="card-text">{{ usuario.dispositivos }}</p>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
 
     <h2>Actualizar o Eliminar Usuario</h2>
     <form id="update-form">
