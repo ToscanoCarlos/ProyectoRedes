@@ -50,7 +50,7 @@ def add_usuario():
 
         return redirect(url_for('usuarios'))
     
-@app.route("/update_usuario/<string:id>", methods=["GET", "POST"])
+@app.route("/update_usuarios/<string:id>", methods=["GET", "POST"])
 def update_usuario(id):
     # get usuario by Id
     print(id)

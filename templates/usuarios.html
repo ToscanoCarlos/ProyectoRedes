@@ -45,8 +45,8 @@
               <div class="d-flex justify-content-between">
                 <h5 class="card-title h6">{{ usuario.nombre}}</h5>
                 <div>
-                  <a href="{{ url_for('app.update_usuario', id=usuario.id) }}" class="btn btn-dark btn-sm rounded-0">Edit</a>
-                  <a href="{{ url_for('app.delete_usuario', id=usuario.id) }}" class="btn btn-danger btn-sm rounded-0">Delete</a>
+                 <a href="{{ url_for('update_usuario', id=usuario.id) }}" class="btn btn-dark btn-sm rounded-0">Edit</a>
+                 <a href="{{ url_for('delete_usuario', id=usuario.id) }}" class="btn btn-danger btn-sm rounded-0">Delete</a>
                 </div>
               </div>
               <p class="card-text">{{ usuario.nombre }}</p>
