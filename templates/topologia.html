@@ -4,24 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detector de Topología</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}"/>
 </head>
 <body>
-    <h1>Detectar Topología</h1>
+    <div class="container">
+        <h1 class="title">Detectar Topología</h1>
 
-    <h2>Obtener Json de Routers</h2>
-    <button type="button" id="get-topology-button">Obtener Topología</button>
+        <h2 class="section-title">Obtener Json de Routers</h2>
+        <button type="button" id="get-topology-button" class="action-button">Obtener Topología</button>
 
-    <h2>Configuración</h2>
-    <form id="config-form">
-        <label for="interval">Intervalo de Exploración (minutos):</label>
-        <input type="number" id="interval" name="interval" min="1" value="5">
-        <button type="button" id="start-button">Iniciar Exploración</button>
-        <button type="button" id="stop-button">Detener Exploración</button>
-    </form>
+        <h2 class="section-title">Configuración</h2>
+        <form id="config-form" class="config-form">
+            <label for="interval" class="config-label">Intervalo de Exploración (minutos):</label>
+            <input type="number" id="interval" name="interval" class="config-input">
+            <button type="button" id="start-button" class="action-button">Iniciar Exploración</button>
+            <button type="button" id="stop-button" class="action-button">Detener Exploración</button>
+        </form>
 
-    <h2>Graficar Topologia</h2>
-    <button type="button" id="graph-button">Graficar Topología</button>
-
-
+        <h2 class="section-title">Graficar Topologia</h2>
+        <button type="button" id="graph-button" class="action-button">Graficar Topología</button>
+    </div>
 </body>
 </html>

@@ -1,7 +1,91 @@
+/* Estilos generales */
 body {
-    background: #121212;
-  }
-  
-  .bg-black {
-    background: #090909 !important;
-  }
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+  text-align: center;
+  font-size: 24px;
+}
+
+/* Estilos del formulario de creación de usuario */
+.user-form label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.user-form input {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.user-form button {
+  display: block;
+  background-color: #007BFF;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+/* Estilos de la lista de usuarios existentes */
+.user-list {
+  margin-top: 20px;
+}
+
+/* Estilos de las tarjetas de usuario */
+.user-card {
+  background-color: #007BFF;
+  color: #fff;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.user-name {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.user-permissions,
+.user-devices {
+  font-size: 16px;
+}
+
+/* Estilos de los botones de editar y eliminar */
+.user-actions a {
+  text-decoration: none;
+  display: inline-block;
+  margin: 5px;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.btn-edit {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: #fff;
+}
+

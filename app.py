@@ -50,10 +50,8 @@ def add_usuario():
 
         return redirect(url_for('usuarios'))
     
-@app.route("/update_usuarios/<string:id>", methods=["GET", "POST"])
+@app.route("/update_usuario/<id>", methods=["GET", "POST"])
 def update_usuario(id):
-    # get usuario by Id
-    print(id)
     usuario = Usuarios.query.get(id)
 
     if request.method == "POST":
@@ -63,11 +61,11 @@ def update_usuario(id):
 
         db.session.commit()
 
-        flash('usuario Actualizado')
+        flash('Usuario Actualizado')
 
         return redirect(url_for('usuarios'))
 
-    return render_template("update_usuarios.html", usuario=usuario)
+    return render_template("update_usuario.html", usuario=usuario)
 
 
 @app.route("/delete_usuario/<id>", methods=["GET"])

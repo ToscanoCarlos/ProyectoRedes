@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE-edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}"/>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title">Edit Usuario</h1>
+
+      <form class="user-form" action="{{url_for('update_usuario', id=usuario.id)}}" method="POST">
+        <div class="form-group">
+          <label class="user-form-label" for="nombre">Nombre:</label>
+          <input
+            type="text"
+            name="nombre"
+            value="{{usuario.nombre}}"
+            class="user-form-input"
+          />
+        </div>
+        <div class="form-group">
+          <label class="user-form-label" for="permisos">Permisos:</label>
+          <input
+            type="text"
+            name="permisos"
+            value="{{usuario.permisos}}"
+            class="user-form-input"
+          />
+        </div>
+        <div class="form-group">
+          <label class="user-form-label" for="dispositivos">Dispositivos:</label>
+          <input
+            type="text"
+            name="dispositivos"
+            value="{{usuario.dispositivos}}"
+            class="user-form-input"
+          />
+        </div>
+
+        <button class="user-form-button">Update</button>
+      </form>
+    </div>
+  </body>
+</html>
