@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE-edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}"/>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title">Edit Router</h1>
+
+      <form class="user-form" action="{{url_for('update_router', id=router.id)}}" method="POST">
+        <div class="form-group">
+          <label class="user-form-label" for="hotsname">Hotsname:</label>
+          <input
+            type="text"
+            name="hotsname"
+            value="{{router.hotsname}}"
+            class="user-form-input"
+          />
+        </div>
+        <div class="form-group">
+          <label class="user-form-label" for="loopback">Loopback:</label>
+          <input
+            type="text"
+            name="loopback"
+            value="{{router.loopback}}"
+            class="user-form-input"
+          />
+        </div>
+        <div class="form-group">
+          <label class="user-form-label" for="admin_ip">Admin IP:</label>
+          <input
+            type="text"
+            name="admin_ip"
+            value="{{router.admin_ip}}"
+            class="user-form-input"
+          />
+        </div>
+        <div class="form-group">
+            <label class="user-form-label" for="rol">Rol:</label>
+            <input
+              type="text"
+              name="rol"
+              value="{{router.rol}}"
+              class="user-form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label class="user-form-label" for="empresa">Empresa:</label>
+            <input
+              type="text"
+              name="empresa"
+              value="{{router.empresa}}"
+              class="user-form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label class="user-form-label" for="so">Sistema Operativo:</label>
+            <input
+              type="text"
+              name="so"
+              value="{{router.so}}"
+              class="user-form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label class="user-form-label" for="vecinos">Vecinos:</label>
+            <input
+              type="text"
+              name="vecinos"
+              value="{{router.vecinos}}"
+              class="user-form-input"
+            />
+          </div>
+
+        <button class="user-form-button">Update</button>
+      </form>
+    </div>
+  </body>
+</html>
