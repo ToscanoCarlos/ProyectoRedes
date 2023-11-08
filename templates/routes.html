@@ -3,50 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Routers y Usuarios</title>
+    <title class="title">Gestión de Routers y Usuarios</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}"/>
 </head>
 <body>
-    <h1>Gestión de Routers y Usuarios</h1>
+    <div class="container">
+        <h1 class="title">Gestión de Routers y Usuarios</h1>
 
-    <!-- Botón para obtener la información general de todos los routers -->
-    <button type="button" id="get-all-routers-button">Obtener Información de Routers</button>
-    <!-- Botón para obtener la información de un router especifico -->
-    <button type="button" id="get-router-button">Obtener Información de Router Específico</button>
-    <!-- Botón para obtener la a información general de la interfaz del router definido -->
-    <button type="button" id="get-interface-button">Obtener Información de Interfaz</button>
-    
+        <!-- Bloque para mostrar los mensajes flash -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="flash-messages">
+                    {% for message in messages %}
+                        <li class="flash-message">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
 
-    <!-- Espacio para mostrar la información de routers -->
-    <div id="router-info">
-        <!-- Aquí se mostrará la información general de los routers en formato JSON -->
+        <!-- Botón para obtener la información general de todos los routers -->
+        <form id="obtener_info" action="/info_routers" method="GET">
+            <button type="submit" id="obtener_info" class="btn">Obtener Información de Routers</button>
+        </form>
+
+
+        <h2 class="section-title">Obtener json con los usuarios existentes en el router específico</h2>
+        <button type="button" id="get-users-button" class="btn">Obtener Usuarios</button>
+
+        <!-- Formulario para agregar un nuevo usuario a un router específico -->
+        <h2 class="section-title">Crear Router</h2>
+        <form action="/new_router" method="POST" class="user-form">
+            <label class="user-form-label">hostaname:</label>
+            <input type="text" name="hostaname" class="user-form-input" autofocus>
+            <label class="user-form-label">loopback:</label>
+            <input type="text" name="loopback" class="user-form-input" autofocus>
+            <label class="user-form-label">admin_ip:</label>
+            <input type="text" name="admin_ip" class="user-form-input" autofocus>
+            <label class="user-form-label">rol:</label>
+            <input type="text" name="rol" class="user-form-input" autofocus>
+            <label class="user-form-label">empresa:</label>
+            <input type="text" name="empresa" class="user-form-input" autofocus>
+            <label class="user-form-label">so:</label>
+            <input type="text" name="so" class="user-form-input" autofocus>
+            <label class="user-form-label">Vecinos:</label>
+            <input type="text" name="vecinos" class="user-form-input" autofocus>
+            <button type="submit" class="btn">Add Router</button>
+        </form>
+        <h2 class="section-title">Interfaz de router</h2>
+        <form action="/get_interfaz" method="POST" class="user-form">
+            <label class="user-form-label">hostname :</label>
+            <input type="text" name="hostname" class="user-form-input">
+            <label class="user-form-label">Interfaz:</label>
+            <input type="text" name="interfaz" class="user-form-input">
+            <button type="submit" class="btn">Obtener info Router</button>
+        </form>
+
+        <!-- Espacio para mostrar la información de usuarios en el router seleccionado -->
+        <div class="col-md-7">
+            {% for router in routers %}
+            <div class="user-card mb-1">
+                <div class="card-body py-2 px-3">
+                    <div class="d-flex justify-content-between">
+                        <h5 class="user-name">{{router.hostname}}</h5>
+                        <div class="user-actions">
+                            <a href="{{ url_for('update_router', id=router.id) }}" class="btn btn-edit">Edit</a>
+                            <a href="{{ url_for('delete_router', id=router.id) }}" class="btn btn-delete">Delete</a>
+                            <a href="{{ url_for('get_router', id=router.id) }}" class="btn">Info</a>
+                            <a href="{{ url_for('get_router', id=router.id) }}" class="btn">Mostrar Usuarios</a>
+                        </div>
+                    </div>
+                    <p class="user-permissions">{{ router.hostname }}</p>
+                    <p class="user-devices">{{ router.admin_ip }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        
     </div>
-    
-    <h2>Obtener json con los usuarios existentes en el router específico</h2>
-    <button type="button" id="get-users-button">Obtener Usuarios</button>
-
-    <!-- Formulario para agregar un nuevo usuario a un router específico -->
-    <h2>Agregar Usuario a Router Específico</h2>
-    <form id="add-user-form">
-        <label>Nombre del Router:</label>
-        <input type="text" id="router-name" name="router-name">
-        <label>Nombre del Usuario:</label>
-        <input type="text" id="user-name" name="user-name">
-        <label>Permisos del Usuario:</label>
-        <input type="text" id="user-permissions" name="user-permissions">
-        <button type="button" id="add-user-button">Agregar Usuario</button>
-    </form>
-
-    <!-- Espacio para mostrar la información de usuarios en el router seleccionado -->
-    <div id="user-info">
-        <!-- Aquí se mostrará la información de usuarios en formato JSON -->
-    </div>
-
-
-
-    <!-- Espacio para mostrar la respuesta de la operación de actualizar o eliminar un usuario -->
-    <div id="update-delete-user-info">
-        <!-- Aquí se mostrará la respuesta en formato JSON -->
-    </div>
-
 </body>
 </html>
