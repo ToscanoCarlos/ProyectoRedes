@@ -66,26 +66,17 @@
                     <div class="d-flex justify-content-between">
                         <h5 class="user-name">{{router.hostname}}</h5>
                         <div class="user-actions">
-                            <div class="column-1">
+                            
                                 <a href="{{ url_for('update_router', id=router.id) }}" class="btn btn-edit">Edit</a>
                                 <a href="{{ url_for('delete_router', id=router.id) }}" class="btn btn-delete">Delete</a>
                                 <a href="{{ url_for('get_router', id=router.id) }}" class="btn">Info</a>
                                 <a href="{{ url_for('get_router', id=router.id) }}" class="btn">Mostrar Usuarios</a>
                                 <br>
                                 <p class="user-devices">{{ router.admin_ip }}</p>
-                            </div>
-                            <div class="column-2">
-                                <h2>Agregar Usuario a este Router</h2>
-                                <form action="/new_user_in_router" method="POST" class="user-form">
-                                    <label for="nombre">Nombre:</label>
-                                    <input type="text" name="nombre_one" autofocus>
-                                    <label for="permisos">Permisos:</label>
-                                    <input type="text" name="permisos_one">
-                                    <label for="dispositivos">Dispositivos:</label>
-                                    <input type="text" name="dispositivos_one">
-                                    <button type="submit" class="btn-edit">Crear Usuario</button>
-                                </form>
-                            </div>
+                            
+                                <a href="{{ url_for('update_one', id=router.id) }}" class="btn btn-edit">Edit un usuario</a>
+                                
+                            
                         </div>
                     </div>
                     
