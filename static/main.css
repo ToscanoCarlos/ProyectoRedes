@@ -100,3 +100,26 @@ h1 {
   color: #fff;
 }
 
+.user-actions {
+  display: flex;
+  justify-content: space-between; /* Ajusta el espacio entre las columnas */
+}
+
+.column-2 {
+  flex: 1;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra los elementos horizontalmente */
+}
+
+/* Ajustes para los elementos dentro de la columna 2 */
+.column-2 form {
+  width: 100%;
+  text-align: center; /* Centra el texto dentro del formulario */
+}
+.column-2 input,
+.column-2 button {
+  width: 80%; /* Ajusta el ancho de los elementos */
+  margin: 5px 0; /* Agrega un pequeño margen entre los elementos */
+}
