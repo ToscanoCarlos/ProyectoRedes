@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE-edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{url_for('static', filename='main.css')}}"/>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="title">Edit Usuario</h1>
+
+      <form class="user-form" action="{{url_for('update_one', id=router.id)}}" method="POST">
+        <div class="form-group">
+          <label class="user-form-label" for="nombre">Nombre:</label>
+          <input
+            type="text"
+            name="nombre_one"
+            class="user-form-input"
+          />
+        </div>
+        <div class="form-group">
+          <label class="user-form-label" for="permisos">Permisos:</label>
+          <input
+            type="text"
+            name="permisos_one"
+            class="user-form-input"
+          />
+        </div>
+        <div class="form-group">
+          <label class="user-form-label" for="dispositivos">Dispositivos:</label>
+          <input
+            type="text"
+            name="dispositivos_one"
+            class="user-form-input"
+          />
+        </div>
+
+        <button class="btn">Update</button>
+      </form>
+    </div>
+  </body>
+</html>
