@@ -11,7 +11,12 @@
         <h1 class="title">Detectar Topología</h1>
 
         <h2 class="section-title">Obtener Json de Routers</h2>
-        <button type="button" id="get-topology-button" class="btn-topo">Obtener Topología</button>
+        <form id="get-topology-button" action="/get_topologia" method="GET">
+            <button type="submit" id="get-topology-button" class="btn-topo">Obtener Topología</button>
+        </form>
+
+
+        
 
         <h2 class="section-title">Configuración</h2>
         <form id="config-form" class="config-form">
@@ -22,7 +27,9 @@
         </form>
 
         <h2 class="section-title">Graficar Topologia</h2>
-        <button type="button" id="graph-button" class="btn-topo">Graficar Topología</button>
+        <form id="print-topology-button" action="/graph_topology" method="GET">
+            <button type="submit" id="print-topology-button" class="btn-topo">Graficar Topología</button>
+        </form>
     </div>
 </body>
 </html>

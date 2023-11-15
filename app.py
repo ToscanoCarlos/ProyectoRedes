@@ -1,18 +1,19 @@
 import getpass
+import time
 from flask import Flask, url_for, jsonify, request, render_template, flash, redirect, Blueprint
 from flask_sqlalchemy import SQLAlchemy
-from routes.ssh import ssh_connect, configure_router_ssh, modify_user_ssh
-from routes.execute import execute_delete_user, execute_users_all, execute_info_router_one, execute_info_interfaz, execute_info_all
+from routes.graficar_topologia import graficar_topologia
+from routes.filtros import extraccion_datos_brief, obtener_nombre_interfaz
+from routes.ssh import delete_user_ssh, ssh_connect, configure_router_ssh, modify_user_ssh
+from routes.execute import execute_comando, execute_delete_user, execute_info_one, execute_users_all, execute_info_router_one, execute_info_all
 import paramiko
 
 
 app = Flask(__name__)
-
 app.secret_key = 'mysecret'
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:12345@localhost/redesdb'
-
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:1234@localhost/redesdb'
 db = SQLAlchemy(app)
+dic_topologia = {"inicio": "inicio"} #Para guardar la topologia en un diccionario global, la razon de esto, nos evita crear una tabla de la conexion de los routers
 
 # Inicializa Flask-SQLAlchemy
 
@@ -56,6 +57,30 @@ def usuarios():
     usuarios = Usuarios.query.all()
     return render_template('usuarios.html', usuarios=usuarios)
 
+@app.route("/actualizar_usuario/<id>/<username>/<permiso>/<dispositivo>", methods=["PUT"])
+def actualizar_usuario(id, username, permiso, dispositivo):
+    #usuario = Usuarios.query.get(id)
+    usuario = Usuarios.query.get_or_404(id)
+    old_username = usuario.nombre
+    usuario.nombre = username
+    print(old_username)
+    print(username)
+    usuario.permisos = permiso
+    usuario.dispositivos = dispositivo
+    db.session.commit()
+    routers = Routers.query.all()
+    for router in routers:
+        modify_user_ssh(router.admin_ip, old_username, username, usuario.permisos)
+    
+
+    # Devuelve la información actualizada del usuario en formato JSON
+    return jsonify({'id': usuario.id, 'nombre': usuario.nombre, 'permisos': usuario.permisos, 'dispositivos': usuario.dispositivos})
+    #return users_info_all("show running-config | include username") 
+
+
+    
+    
+
 
 @app.route('/new_usuario', methods=['POST'])
 def add_usuario():
@@ -65,7 +90,8 @@ def add_usuario():
         dispositivos = request.form['dispositivos']
 
         new_usuario = Usuarios(nombre, permisos, dispositivos)
-        agregar_usuario(nombre, permisos)
+        routers = Routers.query.all()
+        agregar_usuario(nombre, permisos, routers, False)
 
         db.session.add(new_usuario)
         db.session.commit()
@@ -74,6 +100,7 @@ def add_usuario():
 
         return users_info_all("show running-config | include username")
     
+
 @app.route("/update_usuario/<id>", methods=["GET", "POST"])
 def update_usuario(id):
     #usuario = Usuarios.query.get(id)
@@ -84,10 +111,11 @@ def update_usuario(id):
         usuario.nombre = request.form['nombre']
         usuario.permisos = request.form['permisos']
         usuario.dispositivos = request.form['dispositivos']
+        db.session.commit()
         routers = Routers.query.all()
         for router in routers:
             modify_user_ssh(router.admin_ip, old_username, usuario.nombre , usuario.permisos)
-        db.session.commit()
+        
 
         flash('Usuario Actualizado')
         
@@ -97,16 +125,22 @@ def update_usuario(id):
     return render_template("update_usuario.html", usuario=usuario)
 
 
-@app.route("/delete_usuario/<id>", methods=["GET"])
+@app.route("/delete_usuario/<id>", methods=["DELETE"])
 def delete_usuario(id):
-    usuario = Usuarios.query.get(id)
+    #usuario = Usuarios.query.get(id)
+    usuario = Usuarios.query.get_or_404(id)
+    routers = Routers.query.all()
+    for router in routers:
+        delete_user_ssh(router.admin_ip, usuario.nombre)
+
     db.session.delete(usuario)
     db.session.commit()
-    delete_user(usuario.nombre)
-    flash('Usuario Eliminado')
+    #Primero hay que estar seguros de haber eliminado todos los usarios ne los oruters, una vez hecho esto
+    #AHora si podemos descomentar estas lineas para eliminar el usuario en la bd.
 
+    # Devuelve la información actualizada del usuario en formato JSON
+    return jsonify({'id': usuario.id, 'nombre': usuario.nombre, 'permisos': usuario.permisos, 'dispositivos': usuario.dispositivos})
 
-    return users_info_all("show running-config | include username") 
 
 
 @app.route('/routes')
@@ -175,7 +209,7 @@ def topologia():
 
 @app.route('/info_routers')
 def activar_comandos():
-    return routers_info_all("show ip interface brief")
+    return routers_info_all("show cdp neighbors")
 
 
 @app.route('/get_users')
@@ -185,7 +219,7 @@ def get_users():
 @app.route("/get_router/<int:id>", methods=["GET"])
 def get_router(id):
     router = Routers.query.get(id)
-    return router_info("show ip interface brief", router)
+    return router_info("show cdp neighbors", router)
 
 @app.route("/get_interfaz", methods=["GET", "POST"])
 def get_interfaz():
@@ -195,42 +229,124 @@ def get_interfaz():
     print(interfaz)
     return info_interfaz(router, interfaz)
 
-   
- 
+@app.route("/get_interfaz2/<hostname>/<num_interfaz>", methods=["GET", "POST"])
+def get_interfaz2 (hostname, num_interfaz ):
+    interfaz = num_interfaz.replace("+","/")
+    #hostname = request.form["hostname"]
+    router = Routers.query.filter_by(hostname=hostname).first()
+    #interfaz  = request.form['interfaz']
+    print(interfaz)
+    return info_interfaz(router, interfaz)
+
+@app.route("/get_router_usuarios/<id>", methods=["GET"])
+def get_router_usuarios(id):
+    router = Routers.query.get(id)
+    router_results = {}
+    ip = router.admin_ip
+    hostname = router.hostname
+    username = "root"  # Tu nombre de usuario
+    password = "root"#PARA QUE LO HAGA AUTO
+    ssh_client = ssh_connect(ip, username, password)
+    if ssh_client:
+        command= "show running-config | include username"
+        router_results[hostname] = execute_info_one(ssh_client, router.admin_ip,command )
+
+        ssh_client.close()
+    return jsonify(router_results)
+
+@app.route("/actualizar_usuario_one_router/<id_router>/<id_user>/<username>/<permiso>", methods=["PUT"])
+def actualizar_usuario_one_router(id_user, id_router, username, permiso):
+    #usuario = Usuarios.query.get(id)
+    usuario = Usuarios.query.get_or_404(id_user)
+    old_username = usuario.nombre
+    usuario.nombre = username
+    usuario.permisos = permiso
+    db.session.commit()
+    router = Routers.query.get_or_404(id_router)
+    modify_user_ssh(router.admin_ip, old_username, username, usuario.permisos)
+    ssh_client = ssh_connect(router.admin_ip, "root", "root")
+    router_results = {}
+    if ssh_client:
+        router.admin_ip
+        command= "show running-config | include username"
+        router_results[router.hostname] = execute_info_one(ssh_client, router.admin_ip,command )
+
+        ssh_client.close()
+    return jsonify(router_results)
+
+
+@app.route("/update_one/<id>", methods=["GET", "POST"])
+def update_one(id):
+    router = Routers.query.get(id)
+    if request.method == "POST":
+        nombre = request.form['nombre_one']
+        permisos = request.form['permisos_one']
+        print(nombre, permisos)
+        dispositivos = request.form['dispositivos_one']
+
+        new_usuario = Usuarios(nombre, permisos, dispositivos)
+        agregar_usuario(nombre, permisos, router, True)
+        ssh_client = ssh_connect(router.admin_ip, "root", "root")
+        router_results = {}
+        if ssh_client:
+            router.admin_ip
+            command= "show running-config | include username"
+            router_results[router.hostname] = execute_info_one(ssh_client, router.admin_ip,command )
+
+            ssh_client.close()
+        db.session.add(new_usuario)
+        db.session.commit()
+        return jsonify(router_results)
+    
+    return render_template("edit_one.html", router = router)
+
+@app.route("/delete_usuario_one_router/<id_router>/<id_user>", methods=["DELETE"])
+def delete_usuario_one_router(id_user, id_router):
+    #usuario = Usuarios.query.get(id)
+    usuario = Usuarios.query.get_or_404(id_user)    
+    router = Routers.query.get_or_404(id_router)
+    delete_user_ssh(router.admin_ip, usuario.nombre)
+
+    ssh_client = ssh_connect(router.admin_ip, "root", "root")
+    router_results = {}
+    if ssh_client:
+        router.admin_ip
+        command= "show running-config | include username"
+        router_results[router.hostname] = execute_info_one(ssh_client, router.admin_ip,command )
+
+        ssh_client.close()
+    #De igual formar solo descomentar esat linea cuando este seguro de que se elimino el usuario
+    # db.session.delete(usuario)
+    # db.session.commit()
+    return jsonify(router_results)
+
+@app.route("/get_topologia", methods=["GET"])
+def recuperar_topologia():
+    analizar_topologia()
+    #print(dic_topologia)
+    return jsonify(dic_topologia)
+
+@app.route("/graph_topology", methods=["GET"])
+def imprimir_topologia():
+    graficar_topologia(dic_topologia)
+    return render_template("topologia.html")
+    
 def routers_info_all(command):
     routers = Routers.query.all()
     router_results = {}
     for router in routers:
         ip = router.admin_ip
         hostname = router.hostname
-        
-
         username = "root"  # Tu nombre de usuario
-        #password = getpass.getpass(f"Contraseña para {username}: ")  # Solicita la contraseña de forma segura
         password = "root"#PARA QUE LO HAGA AUTO
         
         ssh_client = ssh_connect(ip, username, password)
         if ssh_client:
             router.admin_ip
-            router_results[hostname] = execute_info_all(ssh_client, router.admin_ip,command, router.rol, router.empresa, router.so, router.vecinos, router.loopback )
+            router_results[hostname] = execute_info_all(ssh_client, router.admin_ip,command, router.rol, router.empresa, router.so, router.vecinos, router.loopback, router.hostname )
 
             ssh_client.close()
     return jsonify(router_results)
-
-
-def delete_user(nombre):
-    routers = Routers.query.all()
-    #ip = '10.10.10.10'  # Reemplaza con la dirección IP de tu router en GNS3
-    username = 'root'  # Reemplaza con tu nombre de usuario
-    password = 'root'  # Reemplaza con tu contraseña
-    commands = [
-        'conf t',
-        f'no username {nombre}',
-        'end'
-    ]
-    for router in routers:
-        execute_delete_user(router.admin_ip, username, password, commands)
-
 
 
 def users_info_all(command):
@@ -239,16 +355,13 @@ def users_info_all(command):
     for router in routers:
         ip = router.admin_ip
         hostname = router.hostname
-        
-
         username = "root"  # Tu nombre de usuario
-        #password = getpass.getpass(f"Contraseña para {username}: ")  # Solicita la contraseña de forma segura
         password = "root"#PARA QUE LO HAGA AUTO
         
         ssh_client = ssh_connect(ip, username, password)
         if ssh_client:
             router.admin_ip
-            router_results[hostname] = execute_users_all(ssh_client, command)
+            router_results[hostname] = execute_users_all(ssh_client, command, router.id)
 
             ssh_client.close()
     return jsonify(router_results)
@@ -258,13 +371,11 @@ def users_info_all(command):
 def router_info(command, router):
     router_result = {}
     ip = router.admin_ip
-    username = "root"  # Tu nombre de usuario
-    #password = getpass.getpass(f"Contraseña para {username}: ")  # Solicita la contraseña de forma segura
-    #comando para ver los usarios y la contra en el router : show running-config | include username
+    username = "root"  # Tu nombre de usuari
     password = "root"
     ssh_client = ssh_connect(ip, username, password)
     if ssh_client:
-        output = execute_info_router_one(ssh_client, router.admin_ip,command, router.rol, router.empresa, router.so, router.vecinos, router.loopback )
+        output = execute_info_all(ssh_client, router.admin_ip,command, router.rol, router.empresa, router.so, router.vecinos, router.loopback, router.hostname )
         router_result[router.hostname] = output
         ssh_client.close()
     return jsonify(router_result)
@@ -277,20 +388,41 @@ def info_interfaz(router, interfaz):
     router_result = {}
     ip = router.admin_ip
     username = "root"  # Tu nombre de usuario
-    #password = getpass.getpass(f"Contraseña para {username}: ")  # Solicita la contraseña de forma segura
-    #comando para ver los usarios y la contra en el router : show running-config | include username
     password = "root"
     ssh_client = ssh_connect(ip, username, password)
+    ssh_client2 = ssh_connect(ip, username, password)
+    numero = 0
     if ssh_client:
-        output = execute_info_interfaz(ssh_client, command, interfaz )
+        output = execute_info_interfaz(ssh_client, ssh_client2, command, interfaz )
         router_result[router.hostname] = output
+        router_result[f'Usuarios del router'] = f'http://127.0.0.1:5000/get_router_usuarios/{router.id}'
         ssh_client.close()
+        ssh_client2.close()
     return jsonify(router_result)
 
+def execute_info_interfaz(ssh_client, ssh_client2, command, interfaz):
+    try:
+        results = {}
+        stdin, stdout, stderr = ssh_client.exec_command(command)
+        output = stdout.read().decode()
+        tipo, ip, mascara, estado = extraccion_datos_brief(output)
+        stdin, stdout, stderr = ssh_client2.exec_command("show cdp neighbors")
+        link_inter_conect = obtener_nombre_interfaz(stdout.read().decode())
+        for link in link_inter_conect:
+            if link[1] == interfaz:
+                 router = Routers.query.filter_by(hostname=link[0]).first()
+                 results["Router conectado"] = f'http://127.0.0.1:5000/get_router/{router.id}'
+                 break
+        results["Tipo y numero"] = tipo
+        results["ip"] = ip
+        results["mascara"] = mascara
+        results["estado"] = estado
+        return results
+    except Exception as e:
+        print(f"Error al ejecutar el comando: {str(e)}")
+ 
 
-def agregar_usuario(nombre, permisos):
-    routers = Routers.query.all()
-    #ip = '10.10.10.10'  # Reemplaza con la dirección IP de tu router en GNS3
+def agregar_usuario(nombre, permisos, routers, solo):
     username = 'root'  # Reemplaza con tu nombre de usuario
     password = 'root'  # Reemplaza con tu contraseña
     commands = [
@@ -306,10 +438,30 @@ def agregar_usuario(nombre, permisos):
         'exit',
         'end'
     ]
-    for router in routers:
-        result = configure_router_ssh(router.admin_ip, username, password, commands)
+    if solo:
+        result = configure_router_ssh(routers.admin_ip, username, password, commands)
+    else:
+        for router in routers:
+            result = configure_router_ssh(router.admin_ip, username, password, commands)
     print(result)
 
+def ejecutar_vecinos(router):
+    ip = router.admin_ip
+    username = "root"  # Tu nombre de usuario
+    password = "root"
+    ssh_client = ssh_connect(ip, username, password)
+    if ssh_client:
+        output = execute_comando(ssh_client, "show cdp neighbors")
+        ssh_client.close()
+    return obtener_nombre_interfaz(output)
+
+def analizar_topologia():
+    dic_topologia.clear()
+    routers = Routers.query.all()
+    for router in routers:
+        conexiones = ejecutar_vecinos(router)
+        vecinos = [conexion[0] for conexion in conexiones]
+        dic_topologia[router.hostname] = vecinos
 
 if __name__ == '__main__':
     app.run(debug=True)
